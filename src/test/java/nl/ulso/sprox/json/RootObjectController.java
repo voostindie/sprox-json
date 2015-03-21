@@ -7,7 +7,7 @@ import java.util.List;
 /**
  *
  */
-public class Controller {
+public class RootObjectController {
 
     @Node
     public RootObject root(@Node long id, NestedObject object) {

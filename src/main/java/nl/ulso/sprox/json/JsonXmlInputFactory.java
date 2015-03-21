@@ -6,9 +6,6 @@ import javax.xml.transform.Source;
 import java.io.InputStream;
 import java.io.Reader;
 
-/**
- *
- */
 public class JsonXmlInputFactory extends XMLInputFactory {
 
     private final String rootNodeName;
@@ -16,7 +13,7 @@ public class JsonXmlInputFactory extends XMLInputFactory {
     public JsonXmlInputFactory() {
         this("root");
     }
-    
+
     public JsonXmlInputFactory(String rootNodeName) {
         this.rootNodeName = rootNodeName;
     }

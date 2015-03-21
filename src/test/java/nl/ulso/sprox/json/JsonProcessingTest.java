@@ -1,11 +1,13 @@
 package nl.ulso.sprox.json;
 
+import nl.ulso.sprox.Node;
 import nl.ulso.sprox.XmlProcessor;
+import nl.ulso.sprox.XmlProcessorException;
 import nl.ulso.sprox.impl.StaxBasedXmlProcessorBuilderFactory;
 import org.junit.Test;
 
-import java.io.InputStreamReader;
-import java.util.List;
+import java.io.StringReader;
+import java.util.StringJoiner;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -16,37 +18,142 @@ import static org.junit.Assert.assertThat;
  */
 public class JsonProcessingTest {
 
-    private XmlProcessor<RootObject> xmlProcessor = new StaxBasedXmlProcessorBuilderFactory()
-            .createXmlProcessorBuilder(RootObject.class)
-            .setXmlInputFactory(new JsonXmlInputFactory())
-            .addControllerClass(Controller.class)
-            .buildXmlProcessor();
-
     @Test
-    public void testInputStream() throws Exception {
-        final RootObject object = xmlProcessor.execute(JsonProcessingTest.class.getResourceAsStream("/test.json"));
-        assertRootObject(object);
+    public void testEmptyObjectIsNotNull() throws Exception {
+        final Object result = processJsonString(
+                "{}",
+                Object.class,
+                EmptyObjectController.class);
+        assertThat(result, notNullValue());
     }
 
     @Test
-    public void testReader() throws Exception {
-        final RootObject object = xmlProcessor.execute(
-                new InputStreamReader(JsonProcessingTest.class.getResourceAsStream("/test.json")));
-        assertRootObject(object);
+    public void testObjectWithSingleIntegerValueAsString() throws Exception {
+        final int value = processJsonString(
+                "{\n" +
+                        "  \"value\": \"42\"\n" +
+                        "}",
+                Integer.class,
+                ObjectWithIntegerController.class);
+        assertThat(value, is(42));
     }
 
-    private void assertRootObject(RootObject object) {
-        assertThat(object, notNullValue());
-        assertThat(object.getId(), is(42));
-        final NestedObject nestedObject = object.getNestedObject();
-        assertThat(nestedObject.getString(), is("Value"));
-        final List<Item> items = nestedObject.getItems();
-        assertThat(items, notNullValue());
-        assertThat(items.size(), is(3));
-        for (int i = 0; i < 3; i++) {
-            final Item item = items.get(i);
-            assertThat(item.getId(), is(i + 1));
-            assertThat(item.getName(), is("Item " + (i + 1)));
+    @Test
+    public void testObjectWithSingleIntegerValueAsNumber() throws Exception {
+        final int value = processJsonString(
+                "{\n  \"value\": 42\n}\n",
+                Integer.class,
+                ObjectWithIntegerController.class);
+        assertThat(value, is(42));
+    }
+
+    @Test
+    public void testObjectWithComplexDouble() throws Exception {
+        final double value = processJsonString(
+                "{\n" +
+                        "  \"value\": -1234.56789e-4\n" +
+                        "}",
+                Double.class,
+                ObjectWithDoubleController.class);
+        assertThat(value, is(-0.123456789));
+    }
+
+    @Test
+    public void testObjectWithMultipleValues() throws Exception {
+        final String value = processJsonString(
+                "{\n" +
+                        "  \"foo\": \"bar\",\n" +
+                        "  \"int\" : 42\n" +
+                        "}",
+                String.class,
+                ObjectWithMultipleValuesController.class);
+        assertThat(value, is("bar,42"));
+    }
+
+    @Test
+    public void testNestedObjects() throws Exception {
+        final String value = processJsonString(
+                "{ \"o1\" : { \"int\": 1 }, \"o2\" : { \"string\": \"2\" } }",
+                String.class,
+                NestedObjectController.class);
+        assertThat(value, is("1,2"));
+    }
+
+    @Test
+    public void testNestedObjectsXmlVersion() throws Exception {
+        final String xml = "<root><o1><int>1</int></o1><o2><string>2</string></o2></root>";
+        final String value = processXmlString(xml, String.class, NestedObjectController.class);
+        assertThat(value, is("1,2"));
+    }
+
+
+    private <T> T processJsonString(String json, Class<T> resultClass, Class controllerClass)
+            throws XmlProcessorException {
+        final XmlProcessor<T> processor = new StaxBasedXmlProcessorBuilderFactory()
+                .createXmlProcessorBuilder(resultClass)
+                .setXmlInputFactory(new JsonXmlInputFactory())
+                .addControllerClass(controllerClass)
+                .buildXmlProcessor();
+        final StringReader reader = new StringReader(json);
+        return processor.execute(reader);
+    }
+
+
+    private <T> T processXmlString(String xml, Class<T> resultClass, Class controllerClass)
+            throws XmlProcessorException {
+        final XmlProcessor<T> processor = new StaxBasedXmlProcessorBuilderFactory()
+                .createXmlProcessorBuilder(resultClass)
+                .addControllerClass(controllerClass)
+                .buildXmlProcessor();
+        final StringReader reader = new StringReader(xml);
+        return processor.execute(reader);
+    }
+
+    public static final class EmptyObjectController {
+        @Node
+        public Object root() {
+            return new Object();
+        }
+    }
+
+    public static final class ObjectWithIntegerController {
+        @Node
+        public Integer root(@Node int value) {
+            return value;
+        }
+    }
+
+    public static final class ObjectWithDoubleController {
+        @Node
+        public Double root(@Node double value) {
+            return value;
+        }
+    }
+
+    public static final class ObjectWithMultipleValuesController {
+        @Node
+        public String root(@Node String foo, @Node("int") int value) {
+            return new StringJoiner(",").add(foo).add(Integer.toString(value)).toString();
+        }
+    }
+
+    public static final class NestedObjectController {
+        @Node
+        public String root(Integer one, String two) {
+            System.out.println("root");
+            return new StringJoiner(",").add(Integer.toString(one)).add(two).toString();
+        }
+
+        @Node
+        public Integer o1(@Node("int") int value) {
+            System.out.println("int: " + value);
+            return value;
+        }
+
+        @Node
+        public String o2(@Node("string") String value) {
+            System.out.println("string: " + value);
+            return value;
         }
     }
 }
