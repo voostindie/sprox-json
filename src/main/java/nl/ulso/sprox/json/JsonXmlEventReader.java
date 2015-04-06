@@ -57,12 +57,12 @@ class JsonXmlEventReader implements XMLEventReader {
             return new StartJsonObjectEvent(names.peek());
         }
         if (this.isValue) {
-            // The previous event was a value. Now insert a end node
+            // The previous event was a value. Now insert an end node to close if off.
             this.isValue = false;
             return new EndJsonObjectEvent(names.pop());
         }
         if (!parser.hasNext()) {
-            // Insert a dummy end node for the root node, at the top of the stack.
+            // The JSON parser is done. So the only reason we get here is that there are names on the stack still:
             return new EndJsonObjectEvent(names.pop());
         }
         return convertEvent(parser.next());
@@ -108,7 +108,7 @@ class JsonXmlEventReader implements XMLEventReader {
                 this.isValue = true;
                 return new JsonCharactersEvent(parser.getString());
             default:
-                throw new IllegalStateException("Unsupported Json event: " + event);
+                throw new IllegalStateException("Unsupported JSON event: " + event);
         }
     }
 
