@@ -14,22 +14,19 @@ import java.util.Stack;
 class JsonXmlEventReader implements XMLEventReader {
 
     private final JsonParser parser;
-    private final Stack<String> names;
-    private boolean isStart;
-    private boolean isValue;
+    private final Stack<String> nameStack;
+    private final Stack<XMLEvent> valueStack;
 
     public JsonXmlEventReader(InputStream inputStream, String rootNodeName) {
         this.parser = Json.createParser(new BufferedInputStream(inputStream));
-        this.names = createNameStack(rootNodeName);
-        this.isStart = true;
-        this.isValue = false;
+        this.nameStack = createNameStack(rootNodeName);
+        this.valueStack = new Stack<>();
     }
 
     JsonXmlEventReader(Reader reader, String rootNodeName) {
         this.parser = Json.createParser(new BufferedReader(reader));
-        this.names = createNameStack(rootNodeName);
-        this.isStart = true;
-        this.isValue = false;
+        this.nameStack = createNameStack(rootNodeName);
+        this.valueStack = new Stack<>();
     }
 
     private Stack<String> createNameStack(String rootNodeName) {
@@ -40,30 +37,23 @@ class JsonXmlEventReader implements XMLEventReader {
 
     @Override
     public boolean hasNext() {
-        return parser.hasNext() || !names.empty();
+        return !valueStack.empty() || !nameStack.empty() || parser.hasNext();
     }
 
     @Override
     public XMLEvent nextEvent() throws XMLStreamException {
         final XMLEvent event = nextEventInternal();
-        System.out.println("                                        " + event.toString());
+        System.out.println("                                        " + event.toString() + " (" + nameStack.size() + ")");
         return event;
     }
 
     private XMLEvent nextEventInternal() {
-        if (this.isStart) {
-            // Insert a dummy start node for the root node, at the top of the stack.
-            this.isStart = false;
-            return new StartJsonObjectEvent(names.peek());
-        }
-        if (this.isValue) {
-            // The previous event was a value. Now insert an end node to close if off.
-            this.isValue = false;
-            return new EndJsonObjectEvent(names.pop());
+        if (!valueStack.empty()) {
+            return valueStack.pop();
         }
         if (!parser.hasNext()) {
             // The JSON parser is done. So the only reason we get here is that there are names on the stack still:
-            return new EndJsonObjectEvent(names.pop());
+            return new EndJsonObjectEvent(nameStack.pop());
         }
         return convertEvent(parser.next());
     }
@@ -73,43 +63,51 @@ class JsonXmlEventReader implements XMLEventReader {
             case KEY_NAME:
                 final String name = parser.getString();
                 System.out.println("KEY_NAME = " + name);
-                names.push(name);
-                return new StartJsonObjectEvent(name);
+                nameStack.push(name);
+                return nextEventInternal();
             case START_OBJECT:
                 System.out.println("START_OBJECT");
-                return nextEventInternal();
+                return new StartJsonObjectEvent(nameStack.peek());
             case END_OBJECT:
                 System.out.println("END_OBJECT");
-                return nextEventInternal();
+                return new EndJsonObjectEvent(nameStack.pop());
             case START_ARRAY:
                 System.out.println("START_ARRAY");
+                nameStack.push(nameStack.peek());
                 return nextEventInternal();
             case END_ARRAY:
                 System.out.println("END_ARRAY");
+                nameStack.pop();
                 return nextEventInternal();
             case VALUE_FALSE:
                 System.out.println("VALUE = false");
-                this.isValue = true;
-                return new JsonCharactersEvent("false");
+                populateValueStack("false");
+                return nextEventInternal();
             case VALUE_TRUE:
                 System.out.println("VALUE = true");
-                this.isValue = true;
-                return new JsonCharactersEvent("true");
+                populateValueStack("true");
+                return nextEventInternal();
             case VALUE_NULL:
                 System.out.println("VALUE = null");
-                this.isValue = true;
-                return new JsonCharactersEvent("null");
+                populateValueStack(null);
+                return nextEventInternal();
             case VALUE_NUMBER:
                 System.out.println("VALUE = " + parser.getBigDecimal().toString());
-                this.isValue = true;
-                return new JsonCharactersEvent(parser.getBigDecimal().toString());
+                populateValueStack(parser.getBigDecimal().toString());
+                return nextEventInternal();
             case VALUE_STRING:
                 System.out.println("VALUE = " + parser.getString());
-                this.isValue = true;
-                return new JsonCharactersEvent(parser.getString());
+                populateValueStack(parser.getString());
+                return nextEventInternal();
             default:
                 throw new IllegalStateException("Unsupported JSON event: " + event);
         }
+    }
+
+    private void populateValueStack(String data) {
+        valueStack.push(new EndJsonObjectEvent(nameStack.peek()));
+        valueStack.push(new JsonCharactersEvent(data));
+        valueStack.push(new StartJsonObjectEvent(nameStack.pop()));
     }
 
     @Override

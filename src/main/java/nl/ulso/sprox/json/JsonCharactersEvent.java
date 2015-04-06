@@ -50,6 +50,6 @@ class JsonCharactersEvent extends JsonEvent implements Characters {
 
     @Override
     public String toString() {
-        return "CHARACTERS: " + data;
+        return "CHARACTERS: \"" + data + "\"";
     }
 }
