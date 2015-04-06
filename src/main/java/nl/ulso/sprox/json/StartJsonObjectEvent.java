@@ -61,4 +61,9 @@ class StartJsonObjectEvent extends JsonEvent implements StartElement {
     public StartElement asStartElement() {
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "START_ELEMENT: " + name;
+    }
 }

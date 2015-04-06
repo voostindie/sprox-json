@@ -7,6 +7,8 @@ import nl.ulso.sprox.impl.StaxBasedXmlProcessorBuilderFactory;
 import org.junit.Test;
 
 import java.io.StringReader;
+import java.util.List;
+import java.util.Optional;
 import java.util.StringJoiner;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -86,6 +88,47 @@ public class JsonProcessingTest {
         assertThat(value, is("1,2"));
     }
 
+    @Test
+    public void testEmptyArray() throws Exception {
+        final String json = "{ \"list\" : [] }";
+        final String value = processJsonString(json, String.class, ArrayOfStringsController.class);
+        assertThat(value, is("[]"));
+    }
+
+    @Test
+    public void testArrayWithOneElement() throws Exception {
+        final String json = "{ \"list\" : [ \"one\" ] }";
+        final String value = processJsonString(json, String.class, ArrayOfStringsController.class);
+        assertThat(value, is("[one]"));
+    }
+
+    @Test
+    public void testComplexObject() throws Exception {
+        final String json = "{\n" +
+                "  \"id\": 42,\n" +
+                "  \"object\": {\n" +
+                "    \"string\": \"Value\",\n" +
+                "    \"list\": [\n" +
+                "      {\n" +
+                "        \"id\": 1,\n" +
+                "        \"name\": \"Item 1\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": 2,\n" +
+                "        \"name\": \"Item 2\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": 3,\n" +
+                "        \"name\": \"Item 3\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  }\n" +
+                "}";
+        final RootObject object = processJsonString(json, RootObject.class, RootObjectController.class);
+        assertThat(object, notNullValue());
+        assertThat(object.getNestedObject(), notNullValue());
+        assertThat(object.getNestedObject().getItems().size(), is(3));
+    }
 
     private <T> T processJsonString(String json, Class<T> resultClass, Class controllerClass)
             throws XmlProcessorException {
@@ -140,19 +183,30 @@ public class JsonProcessingTest {
     public static final class NestedObjectController {
         @Node
         public String root(Integer one, String two) {
-            System.out.println("root");
             return new StringJoiner(",").add(Integer.toString(one)).add(two).toString();
         }
 
         @Node
         public Integer o1(@Node("int") int value) {
-            System.out.println("int: " + value);
             return value;
         }
 
         @Node
         public String o2(@Node("string") String value) {
-            System.out.println("string: " + value);
+            return value;
+        }
+    }
+
+    public static final class ArrayOfStringsController {
+        @Node
+        public String root(Optional<List<String>> items) {
+            final StringJoiner joiner = new StringJoiner(",", "[", "]");
+            items.ifPresent(list -> list.forEach(joiner::add));
+            return joiner.toString();
+        }
+
+        @Node
+        public String list(@Node("list") String value) {
             return value;
         }
     }

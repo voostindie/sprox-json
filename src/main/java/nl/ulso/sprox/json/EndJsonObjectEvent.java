@@ -39,4 +39,9 @@ class EndJsonObjectEvent extends JsonEvent implements EndElement {
     public EndElement asEndElement() {
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "END_ELEMENT: " + name;
+    }
 }

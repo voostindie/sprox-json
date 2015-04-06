@@ -47,4 +47,9 @@ class JsonCharactersEvent extends JsonEvent implements Characters {
     public Characters asCharacters() {
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "CHARACTERS: " + data;
+    }
 }
