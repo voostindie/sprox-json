@@ -1,5 +1,7 @@
 # Sprox - JSON support
 
+[![Build Status](https://travis-ci.org/voostindie/sprox-json.svg?branch=master)](https://travis-ci.org/voostindie/sprox-json)
+
 `sprox-json` provides a limited implementation of the Java `XMLEventReader` interface specifically to allow [Sprox](https://github.com/voostindie/sprox) to process JSON documents.
 
 This is **not** a general purpose JSON to XML adapter! This implementation provides the smallest implementation possible to make Sprox process JSON objects. Many methods throw an `UnsupportedOperationException`. Only what Sprox uses is implemented.
