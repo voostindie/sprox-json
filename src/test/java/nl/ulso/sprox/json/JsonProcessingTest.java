@@ -103,6 +103,13 @@ public class JsonProcessingTest {
     }
 
     @Test
+    public void testArrayWithMultipleElements() throws Exception {
+        final String json = "{ \"list\" : [ \"one\", \"two\", \"three\" ] }";
+        final String value = processJsonString(json, String.class, ArrayOfStringsController.class);
+        assertThat(value, is("[one,two,three]"));
+    }
+
+    @Test
     public void testComplexObject() throws Exception {
         final String json = "{\n" +
                 "  \"id\": 42,\n" +
