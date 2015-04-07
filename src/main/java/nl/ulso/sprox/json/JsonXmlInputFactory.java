@@ -6,17 +6,46 @@ import javax.xml.transform.Source;
 import java.io.InputStream;
 import java.io.Reader;
 
+/**
+ * Implementation of {@link XMLInputFactory} that creates {@link XMLEventReader}s for JSON data. Only the methods used
+ * by Sprox - that's two on a total of twenty four! - are implemented; all other methods throw an
+ * {@link UnsupportedOperationException}.
+ */
 public class JsonXmlInputFactory extends XMLInputFactory {
 
+    private static final int DEFAULT_MAXIMUM_STACK_DEPTH = 64;
+    private static final String DEFAULT_ROOT_NODE_NAME = "root";
+
     private final String rootNodeName;
+    private final int maximumStackDepth;
 
     public JsonXmlInputFactory() {
-        this("root");
+        this(DEFAULT_ROOT_NODE_NAME, DEFAULT_MAXIMUM_STACK_DEPTH);
     }
 
     public JsonXmlInputFactory(String rootNodeName) {
-        this.rootNodeName = rootNodeName;
+        this(rootNodeName, DEFAULT_MAXIMUM_STACK_DEPTH);
     }
+
+    public JsonXmlInputFactory(int maximumStackDepth) {
+        this(DEFAULT_ROOT_NODE_NAME, maximumStackDepth);
+    }
+
+    public JsonXmlInputFactory(String rootNodeName, int maximumStackDepth) {
+        this.rootNodeName = rootNodeName;
+        this.maximumStackDepth = maximumStackDepth;
+    }
+
+    @Override
+    public XMLEventReader createXMLEventReader(Reader reader) throws XMLStreamException {
+        return new JsonXmlEventReader(reader, rootNodeName, maximumStackDepth);
+    }
+
+    @Override
+    public XMLEventReader createXMLEventReader(InputStream stream) throws XMLStreamException {
+        return new JsonXmlEventReader(stream, rootNodeName, maximumStackDepth);
+    }
+
 
     @Override
     public XMLStreamReader createXMLStreamReader(Reader reader) throws XMLStreamException {
@@ -49,11 +78,6 @@ public class JsonXmlInputFactory extends XMLInputFactory {
     }
 
     @Override
-    public XMLEventReader createXMLEventReader(Reader reader) throws XMLStreamException {
-        return new JsonXmlEventReader(reader, rootNodeName);
-    }
-
-    @Override
     public XMLEventReader createXMLEventReader(String systemId, Reader reader) throws XMLStreamException {
         throw new UnsupportedOperationException();
     }
@@ -66,11 +90,6 @@ public class JsonXmlInputFactory extends XMLInputFactory {
     @Override
     public XMLEventReader createXMLEventReader(Source source) throws XMLStreamException {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public XMLEventReader createXMLEventReader(InputStream stream) throws XMLStreamException {
-        return new JsonXmlEventReader(stream, rootNodeName);
     }
 
     @Override

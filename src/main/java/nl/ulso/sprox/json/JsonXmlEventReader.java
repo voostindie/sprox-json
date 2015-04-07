@@ -18,17 +18,17 @@ class JsonXmlEventReader implements XMLEventReader {
     private final NameStack nameStack;
     private final Queue<XMLEvent> valueQueue;
 
-    public JsonXmlEventReader(InputStream inputStream, String rootNodeName) {
-        this(Json.createParser(new BufferedInputStream(inputStream)), rootNodeName);
+    public JsonXmlEventReader(InputStream inputStream, String rootNodeName, int maximumStackDepth) {
+        this(Json.createParser(new BufferedInputStream(inputStream)), rootNodeName, maximumStackDepth);
     }
 
-    public JsonXmlEventReader(Reader reader, String rootNodeName) {
-        this(Json.createParser(new BufferedReader(reader)), rootNodeName);
+    public JsonXmlEventReader(Reader reader, String rootNodeName, int maximumStackDepth) {
+        this(Json.createParser(new BufferedReader(reader)), rootNodeName, maximumStackDepth);
     }
 
-    private JsonXmlEventReader(JsonParser parser, String rootNodeName) {
+    private JsonXmlEventReader(JsonParser parser, String rootNodeName, int maximumStackDepth) {
         this.parser = parser;
-        this.nameStack = new NameStack(rootNodeName, 64);
+        this.nameStack = new NameStack(rootNodeName, maximumStackDepth);
         this.valueQueue = new ArrayDeque<>(3);
     }
 
