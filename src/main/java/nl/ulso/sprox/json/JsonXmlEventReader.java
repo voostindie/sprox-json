@@ -9,13 +9,14 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 class JsonXmlEventReader implements XMLEventReader {
 
     private final JsonParser parser;
-    private final Stack<Name> nameStack;
-    private final Stack<XMLEvent> valueStack;
+    private final NameStack nameStack;
+    private final Queue<XMLEvent> valueQueue;
 
     public JsonXmlEventReader(InputStream inputStream, String rootNodeName) {
         this(Json.createParser(new BufferedInputStream(inputStream)), rootNodeName);
@@ -27,84 +28,64 @@ class JsonXmlEventReader implements XMLEventReader {
 
     private JsonXmlEventReader(JsonParser parser, String rootNodeName) {
         this.parser = parser;
-        this.nameStack = new Stack<>();
-        this.valueStack = new Stack<>();
-        pushName(rootNodeName);
+        this.nameStack = new NameStack(rootNodeName, 64);
+        this.valueQueue = new ArrayDeque<>(3);
     }
 
     @Override
     public boolean hasNext() {
-        return !valueStack.empty() || !nameStack.empty() || parser.hasNext();
+        return !valueQueue.isEmpty() || parser.hasNext();
     }
 
     @Override
     public XMLEvent nextEvent() throws XMLStreamException {
-        final XMLEvent event = nextEventInternal();
-        System.out.println("                                        " + event.toString() + " (" + nameStack.size() + ")");
-        return event;
-    }
-
-    private XMLEvent nextEventInternal() {
-        if (!valueStack.empty()) {
-            return valueStack.pop();
-        }
-        if (!parser.hasNext()) {
-            return new EndObjectEvent(peekOrPopName());
+        if (!valueQueue.isEmpty()) {
+            return valueQueue.remove();
         }
         return convertEvent(parser.next());
     }
 
-    private XMLEvent convertEvent(JsonParser.Event event) {
+    private XMLEvent convertEvent(JsonParser.Event event) throws XMLStreamException {
         switch (event) {
-            case KEY_NAME:
-                final String name = parser.getString();
-                System.out.println("KEY_NAME = " + name);
-                pushName(name);
-                return nextEventInternal();
             case START_OBJECT:
-                System.out.println("START_OBJECT");
-                return new StartObjectEvent(peekName());
+                return new StartObjectEvent(nameStack.peek());
             case END_OBJECT:
-                System.out.println("END_OBJECT");
-                return new EndObjectEvent(peekOrPopName());
+                return new EndObjectEvent(nameStack.conditionalPop());
+            case KEY_NAME:
+                nameStack.push(parser.getString());
+                break;
             case START_ARRAY:
-                System.out.println("START_ARRAY");
-                markNameAsArray();
-                return nextEventInternal();
+                nameStack.markAsArray();
+                break;
             case END_ARRAY:
-                System.out.println("END_ARRAY");
-                popName();
-                return nextEventInternal();
+                nameStack.forcePop();
+                break;
             case VALUE_FALSE:
-                System.out.println("VALUE = false");
                 populateValueStack("false");
-                return nextEventInternal();
+                break;
             case VALUE_TRUE:
-                System.out.println("VALUE = true");
                 populateValueStack("true");
-                return nextEventInternal();
+                break;
             case VALUE_NULL:
-                System.out.println("VALUE = null");
                 populateValueStack(null);
-                return nextEventInternal();
+                break;
             case VALUE_NUMBER:
-                System.out.println("VALUE = " + parser.getBigDecimal().toString());
                 populateValueStack(parser.getBigDecimal().toString());
-                return nextEventInternal();
+                break;
             case VALUE_STRING:
-                System.out.println("VALUE = " + parser.getString());
                 populateValueStack(parser.getString());
-                return nextEventInternal();
+                break;
             default:
-                throw new IllegalStateException("Unsupported JSON event: " + event);
+                throw new XMLStreamException("Unsupported JSON event: " + event);
         }
+        return nextEvent();
     }
 
     private void populateValueStack(String value) {
-        final String name = peekOrPopName();
-        valueStack.push(new EndObjectEvent(name));
-        valueStack.push(new ValueEvent(value));
-        valueStack.push(new StartObjectEvent(name));
+        final String name = nameStack.conditionalPop();
+        valueQueue.add(new StartObjectEvent(name));
+        valueQueue.add(new ValueEvent(value));
+        valueQueue.add(new EndObjectEvent(name));
     }
 
     @Override
@@ -134,38 +115,5 @@ class JsonXmlEventReader implements XMLEventReader {
     @Override
     public Object getProperty(String name) throws IllegalArgumentException {
         throw new UnsupportedOperationException();
-    }
-
-    private void pushName(String name) {
-        this.nameStack.push(new Name(name));
-    }
-
-    private String peekName() {
-        return nameStack.peek().value;
-    }
-
-    private String peekOrPopName() {
-        final Name name = nameStack.peek();
-        if (!name.isArray) {
-            nameStack.pop();
-        }
-        return name.value;
-    }
-
-    private void popName() {
-        nameStack.pop();
-    }
-
-    private void markNameAsArray() {
-        nameStack.peek().isArray = true;
-    }
-
-    private static final class Name {
-        private final String value;
-        private boolean isArray;
-
-        public Name(String name) {
-            this.value = name;
-        }
     }
 }
