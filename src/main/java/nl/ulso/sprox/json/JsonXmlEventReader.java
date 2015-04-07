@@ -14,25 +14,22 @@ import java.util.Stack;
 class JsonXmlEventReader implements XMLEventReader {
 
     private final JsonParser parser;
-    private final Stack<String> nameStack;
+    private final Stack<Name> nameStack;
     private final Stack<XMLEvent> valueStack;
 
     public JsonXmlEventReader(InputStream inputStream, String rootNodeName) {
-        this.parser = Json.createParser(new BufferedInputStream(inputStream));
-        this.nameStack = createNameStack(rootNodeName);
-        this.valueStack = new Stack<>();
+        this(Json.createParser(new BufferedInputStream(inputStream)), rootNodeName);
     }
 
-    JsonXmlEventReader(Reader reader, String rootNodeName) {
-        this.parser = Json.createParser(new BufferedReader(reader));
-        this.nameStack = createNameStack(rootNodeName);
-        this.valueStack = new Stack<>();
+    public JsonXmlEventReader(Reader reader, String rootNodeName) {
+        this(Json.createParser(new BufferedReader(reader)), rootNodeName);
     }
 
-    private Stack<String> createNameStack(String rootNodeName) {
-        final Stack<String> stack = new Stack<>();
-        stack.push(rootNodeName);
-        return stack;
+    private JsonXmlEventReader(JsonParser parser, String rootNodeName) {
+        this.parser = parser;
+        this.nameStack = new Stack<>();
+        this.valueStack = new Stack<>();
+        pushName(rootNodeName);
     }
 
     @Override
@@ -52,8 +49,7 @@ class JsonXmlEventReader implements XMLEventReader {
             return valueStack.pop();
         }
         if (!parser.hasNext()) {
-            // The JSON parser is done. So the only reason we get here is that there are names on the stack still:
-            return new EndJsonObjectEvent(nameStack.pop());
+            return new EndJsonObjectEvent(peekOrPopName());
         }
         return convertEvent(parser.next());
     }
@@ -63,21 +59,21 @@ class JsonXmlEventReader implements XMLEventReader {
             case KEY_NAME:
                 final String name = parser.getString();
                 System.out.println("KEY_NAME = " + name);
-                nameStack.push(name);
+                pushName(name);
                 return nextEventInternal();
             case START_OBJECT:
                 System.out.println("START_OBJECT");
-                return new StartJsonObjectEvent(nameStack.peek());
+                return new StartJsonObjectEvent(peekName());
             case END_OBJECT:
                 System.out.println("END_OBJECT");
-                return new EndJsonObjectEvent(nameStack.pop());
+                return new EndJsonObjectEvent(peekOrPopName());
             case START_ARRAY:
                 System.out.println("START_ARRAY");
-                nameStack.push(nameStack.peek());
+                markNameAsArray();
                 return nextEventInternal();
             case END_ARRAY:
                 System.out.println("END_ARRAY");
-                nameStack.pop();
+                popName();
                 return nextEventInternal();
             case VALUE_FALSE:
                 System.out.println("VALUE = false");
@@ -104,10 +100,11 @@ class JsonXmlEventReader implements XMLEventReader {
         }
     }
 
-    private void populateValueStack(String data) {
-        valueStack.push(new EndJsonObjectEvent(nameStack.peek()));
-        valueStack.push(new JsonCharactersEvent(data));
-        valueStack.push(new StartJsonObjectEvent(nameStack.pop()));
+    private void populateValueStack(String value) {
+        final String name = peekOrPopName();
+        valueStack.push(new EndJsonObjectEvent(name));
+        valueStack.push(new JsonCharactersEvent(value));
+        valueStack.push(new StartJsonObjectEvent(name));
     }
 
     @Override
@@ -137,5 +134,38 @@ class JsonXmlEventReader implements XMLEventReader {
     @Override
     public Object getProperty(String name) throws IllegalArgumentException {
         throw new UnsupportedOperationException();
+    }
+
+    private void pushName(String name) {
+        this.nameStack.push(new Name(name));
+    }
+
+    private String peekName() {
+        return nameStack.peek().value;
+    }
+
+    private String peekOrPopName() {
+        final Name name = nameStack.peek();
+        if (!name.isArray) {
+            nameStack.pop();
+        }
+        return name.value;
+    }
+
+    private void popName() {
+        nameStack.pop();
+    }
+
+    private void markNameAsArray() {
+        nameStack.peek().isArray = true;
+    }
+
+    private static final class Name {
+        private final String value;
+        private boolean isArray;
+
+        public Name(String name) {
+            this.value = name;
+        }
     }
 }
