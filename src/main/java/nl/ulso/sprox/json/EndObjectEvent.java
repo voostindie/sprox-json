@@ -5,13 +5,13 @@ import javax.xml.stream.events.EndElement;
 import java.util.Iterator;
 
 /**
- *
+ * Adapts a JSON End Object event to an XML End Element event.
  */
-class EndJsonObjectEvent extends JsonEvent implements EndElement {
+class EndObjectEvent extends JsonEvent implements EndElement {
 
     private final QName name;
 
-    public EndJsonObjectEvent(String name) {
+    public EndObjectEvent(String name) {
         this.name = new QName(name);
     }
 

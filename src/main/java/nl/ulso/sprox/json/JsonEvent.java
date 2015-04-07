@@ -9,7 +9,9 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.Writer;
 
-
+/**
+ * Abstract base class for JSON events that are to be adapted to XML events.
+ */
 abstract class JsonEvent implements XMLEvent {
 
     @Override

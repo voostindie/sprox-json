@@ -7,13 +7,13 @@ import javax.xml.stream.events.StartElement;
 import java.util.Iterator;
 
 /**
- *
+ * Adapts a JSON Start Object event to an XML Start Element event.
  */
-class StartJsonObjectEvent extends JsonEvent implements StartElement {
+class StartObjectEvent extends JsonEvent implements StartElement {
 
     private final QName name;
 
-    public StartJsonObjectEvent(String name) {
+    public StartObjectEvent(String name) {
         this.name = new QName(name);
     }
 

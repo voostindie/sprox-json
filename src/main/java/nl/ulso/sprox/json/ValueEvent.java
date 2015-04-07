@@ -4,12 +4,12 @@ import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.XMLEvent;
 
 /**
- *
+ * Adapts a JSON Value event to an XML Characters event.
  */
-class JsonCharactersEvent extends JsonEvent implements Characters {
+class ValueEvent extends JsonEvent implements Characters {
     private final String data;
 
-    JsonCharactersEvent(String data) {
+    ValueEvent(String data) {
         this.data = data;
     }
 

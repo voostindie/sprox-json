@@ -49,7 +49,7 @@ class JsonXmlEventReader implements XMLEventReader {
             return valueStack.pop();
         }
         if (!parser.hasNext()) {
-            return new EndJsonObjectEvent(peekOrPopName());
+            return new EndObjectEvent(peekOrPopName());
         }
         return convertEvent(parser.next());
     }
@@ -63,10 +63,10 @@ class JsonXmlEventReader implements XMLEventReader {
                 return nextEventInternal();
             case START_OBJECT:
                 System.out.println("START_OBJECT");
-                return new StartJsonObjectEvent(peekName());
+                return new StartObjectEvent(peekName());
             case END_OBJECT:
                 System.out.println("END_OBJECT");
-                return new EndJsonObjectEvent(peekOrPopName());
+                return new EndObjectEvent(peekOrPopName());
             case START_ARRAY:
                 System.out.println("START_ARRAY");
                 markNameAsArray();
@@ -102,9 +102,9 @@ class JsonXmlEventReader implements XMLEventReader {
 
     private void populateValueStack(String value) {
         final String name = peekOrPopName();
-        valueStack.push(new EndJsonObjectEvent(name));
-        valueStack.push(new JsonCharactersEvent(value));
-        valueStack.push(new StartJsonObjectEvent(name));
+        valueStack.push(new EndObjectEvent(name));
+        valueStack.push(new ValueEvent(value));
+        valueStack.push(new StartObjectEvent(name));
     }
 
     @Override
