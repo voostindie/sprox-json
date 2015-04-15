@@ -48,5 +48,6 @@ public class SpotifyAlbumTest {
         assertThat(album.getReleaseDate(), is(LocalDate.parse("2009-02-23")));
         assertThat(album.getTracks().size(), is(10));
         assertThat(album.getTracks().get(0).getTitle(), is("Harmony Korine"));
+        assertThat(album.getTracks().get(9).getTitle(), is("Insurgentes"));
     }
 }

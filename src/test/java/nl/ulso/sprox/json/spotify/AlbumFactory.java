@@ -42,7 +42,7 @@ public class AlbumFactory {
     }
 
     @Node("items")
-    public Track createTrack(@Node("track_number") Integer trackNumber, @Node("name") String name) {
+    public Track createTrack(@Node("track_number") Integer trackNumber, @Node String name) {
         return new Track(trackNumber, name);
     }
 }
