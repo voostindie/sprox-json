@@ -17,16 +17,18 @@
 package nl.ulso.sprox.json;
 
 import nl.ulso.sprox.Node;
-import nl.ulso.sprox.XmlProcessor;
+import nl.ulso.sprox.XmlProcessorBuilder;
 import nl.ulso.sprox.XmlProcessorException;
 import nl.ulso.sprox.impl.StaxBasedXmlProcessorBuilderFactory;
 import org.junit.Test;
 
+import javax.xml.stream.XMLInputFactory;
 import java.io.StringReader;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
 
+import static nl.ulso.sprox.json.JsonValueParserWrapper.addDefaultJsonParsers;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -126,6 +128,13 @@ public class JsonProcessingTest {
     }
 
     @Test
+    public void testLiteralValues() throws Exception {
+        final String json = "{ \"foo\" : null, \"bar\" : false, \"baz\" : true }";
+        final String value = processJsonString(json, String.class, LiteralValuesController.class);
+        assertThat(value, is("NULL|false|true"));
+    }
+
+    @Test
     public void testComplexObject() throws Exception {
         final String json = "{\n" +
                 "  \"id\": 42,\n" +
@@ -153,26 +162,65 @@ public class JsonProcessingTest {
         assertThat(object.getNestedObject().getItems().size(), is(3));
     }
 
-    private <T> T processJsonString(String json, Class<T> resultClass, Class controllerClass)
-            throws XmlProcessorException {
-        final XmlProcessor<T> processor = new StaxBasedXmlProcessorBuilderFactory()
-                .createXmlProcessorBuilder(resultClass)
-                .setXmlInputFactory(new JsonXmlInputFactory())
-                .addControllerClass(controllerClass)
-                .buildXmlProcessor();
-        final StringReader reader = new StringReader(json);
-        return processor.execute(reader);
+    @Test
+    public void testCustomRootNodeName() throws Exception {
+        final int value = processString(
+                "{\n" +
+                        "  \"value\": \"42\"\n" +
+                        "}",
+                Integer.class,
+                ObjectWithIntegerAndCustomRootNodeNameController.class,
+                new JsonXmlInputFactory("custom"));
+        assertThat(value, is(42));
+    }
+
+    @Test(expected = XmlProcessorException.class)
+    public void testCustomMaximumDepth() throws Exception {
+        processString(
+                "{ \"o1\" : { \"int\": 1 }, \"o2\" : { \"string\": \"2\" } }",
+                String.class,
+                NestedObjectController.class,
+                new JsonXmlInputFactory(1));
+    }
+
+    @Test
+    public void testCustomRootNodeNameAndCustomMaximumDepth() throws Exception {
+        final int value = processString(
+                "{\n" +
+                        "  \"value\": \"42\"\n" +
+                        "}",
+                Integer.class,
+                ObjectWithIntegerAndCustomRootNodeNameController.class,
+                new JsonXmlInputFactory("custom", 2));
+        assertThat(value, is(42));
+    }
+
+    @Test(expected = XmlProcessorException.class)
+    public void testInvalidJson() throws Exception {
+        processJsonString("{ value : 42 }", Integer.class, ObjectWithIntegerController.class);
     }
 
 
+    private <T> T processString(String string, Class<T> resultClass, Class controllerClass, XMLInputFactory factory)
+            throws XmlProcessorException {
+        final XmlProcessorBuilder<T> builder = new StaxBasedXmlProcessorBuilderFactory()
+                .createXmlProcessorBuilder(resultClass)
+                .setXmlInputFactory(factory)
+                .addControllerClass(controllerClass);
+        addDefaultJsonParsers(builder);
+        return builder.buildXmlProcessor()
+                .execute(new StringReader(string));
+    }
+
+
+    private <T> T processJsonString(String json, Class<T> resultClass, Class controllerClass)
+            throws XmlProcessorException {
+        return processString(json, resultClass, controllerClass, new JsonXmlInputFactory());
+    }
+
     private <T> T processXmlString(String xml, Class<T> resultClass, Class controllerClass)
             throws XmlProcessorException {
-        final XmlProcessor<T> processor = new StaxBasedXmlProcessorBuilderFactory()
-                .createXmlProcessorBuilder(resultClass)
-                .addControllerClass(controllerClass)
-                .buildXmlProcessor();
-        final StringReader reader = new StringReader(xml);
-        return processor.execute(reader);
+        return processString(xml, resultClass, controllerClass, XMLInputFactory.newFactory());
     }
 
     public static final class EmptyObjectController {
@@ -189,10 +237,24 @@ public class JsonProcessingTest {
         }
     }
 
+    public static final class ObjectWithIntegerAndCustomRootNodeNameController {
+        @Node
+        public Integer custom(@Node int value) {
+            return value;
+        }
+    }
+
     public static final class ObjectWithDoubleController {
         @Node
         public Double root(@Node double value) {
             return value;
+        }
+    }
+
+    public static final class LiteralValuesController {
+        @Node
+        public String root(@Node Optional<String> foo, @Node boolean bar, @Node boolean baz) {
+            return foo.orElse("NULL") + "|" + bar + "|" + baz;
         }
     }
 

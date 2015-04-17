@@ -17,6 +17,7 @@
 package nl.ulso.sprox.json;
 
 import javax.json.Json;
+import javax.json.JsonException;
 import javax.json.stream.JsonParser;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -27,6 +28,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayDeque;
 import java.util.Queue;
+
+import static nl.ulso.sprox.json.JsonXmlConstants.NULL_VALUE;
 
 class JsonXmlEventReader implements XMLEventReader {
 
@@ -58,7 +61,13 @@ class JsonXmlEventReader implements XMLEventReader {
         if (!valueQueue.isEmpty()) {
             return valueQueue.remove();
         }
-        return convertEvent(parser.next());
+        final JsonParser.Event next;
+        try {
+            next = parser.next();
+        } catch (JsonException e) {
+            throw new XMLStreamException(e);
+        }
+        return convertEvent(next);
     }
 
     private XMLEvent convertEvent(JsonParser.Event event) throws XMLStreamException {
@@ -83,7 +92,7 @@ class JsonXmlEventReader implements XMLEventReader {
                 populateValueStack("true");
                 break;
             case VALUE_NULL:
-                populateValueStack(null);
+                populateValueStack(NULL_VALUE);
                 break;
             case VALUE_NUMBER:
                 populateValueStack(parser.getBigDecimal().toString());

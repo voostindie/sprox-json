@@ -117,6 +117,16 @@ Here `Record` and `Item` are custom domain classes.
 
 The goal of `sprox-json` is to allow you to process a JSON document into your own system with as little code as possible, just like Sprox does for XML, without polluting your domain classes with silly setters or annotations, without having to generate otherwise useless code just for mapping purposes, and without having to read complete JSON documents into memory. Just pick what you need from the input document and ignore the rest.
 
+## Handling null values
+
+JSON supports null values. XML does not. To work around that issue `sprox-json` produces a most unlikely, hideous string value defined in `JsonXmlConstants.NULL_VALUE` whenever it finds a `null`.
+
+And of course, it's up to you to handle this value.
+
+The easiest way to do this is to use the `JsonValueParserWrapper`. This parser implements the Sprox `Parser` interface and wraps another parser. It converts the ugly constant value back into an actual `null` value that it then returns. It passes any other String values to the parser it wraps. If you do this then in your controller classes all you need to do is define the parameter as an `Optional<String>`, which is exactly what you would want to do anyway.
+
+In case your processor needs to be able to map to all Java primitives and all values might be `null` in the JSON input, call the convience method `JsonValueParserWrapper.addDefaultJsonParsers(XmlProcessorBuilder<T> builder)` to replace all Sprox built-in parsers with parsers that support JSON null values.
+
 ## Custom root node name
 
 A JSON document is defined as a single, unnamed object. Sprox needs a name, so `sprox-json` invents one: "`root`". If this is not to your liking, you can configure it when constructing the `JsonXmlInputFactory`.

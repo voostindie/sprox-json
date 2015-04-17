@@ -16,6 +16,7 @@
 
 package nl.ulso.sprox.json;
 
+import javax.xml.stream.XMLStreamException;
 import java.util.Stack;
 
 /**
@@ -29,12 +30,12 @@ final class NameStack {
     public NameStack(String rootNodeName, int maximumStackDepth) {
         stack = new Stack<>();
         maxDepth = maximumStackDepth;
-        push(rootNodeName);
+        stack.push(new Name(rootNodeName));
     }
 
-    void push(String name) {
+    void push(String name) throws XMLStreamException {
         if (stack.size() == maxDepth) {
-            throw new IndexOutOfBoundsException("Maximum stack depth reached: " + maxDepth);
+            throw new XMLStreamException("Maximum stack depth reached: " + maxDepth);
         }
         stack.push(new Name(name));
     }

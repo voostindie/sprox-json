@@ -22,6 +22,8 @@ import javax.xml.transform.Source;
 import java.io.InputStream;
 import java.io.Reader;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Implementation of {@link XMLInputFactory} that creates {@link XMLEventReader}s for JSON data. Only the methods used
  * by Sprox - that's two on a total of twenty four! - are implemented; all other methods throw an
@@ -48,7 +50,10 @@ public class JsonXmlInputFactory extends XMLInputFactory {
     }
 
     public JsonXmlInputFactory(String rootNodeName, int maximumStackDepth) {
-        this.rootNodeName = rootNodeName;
+        this.rootNodeName = requireNonNull(rootNodeName);
+        if (maximumStackDepth < 1) {
+            throw new IllegalArgumentException("Minimum stack depth required is 1");
+        }
         this.maximumStackDepth = maximumStackDepth;
     }
 
