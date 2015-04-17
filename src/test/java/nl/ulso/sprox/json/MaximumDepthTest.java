@@ -16,28 +16,17 @@
 
 package nl.ulso.sprox.json;
 
-import nl.ulso.sprox.Node;
+import nl.ulso.sprox.XmlProcessorException;
+import org.junit.Test;
 
-import java.util.List;
+public class MaximumDepthTest {
 
-/**
- *
- */
-public class RootObjectController {
-
-    @Node
-    public RootObject root(@Node long id, NestedObject object) {
-        return new RootObject(id, object);
+    @Test(expected = XmlProcessorException.class)
+    public void testCustomMaximumDepth() throws Exception {
+        SproxJsonTests.processString(
+                "{ \"o1\" : { \"int\": 1 }, \"o2\" : { \"string\": \"2\" } }",
+                String.class,
+                NestedObjectTest.NestedObjectController.class,
+                new JsonXmlInputFactory(1));
     }
-
-    @Node
-    public NestedObject object(@Node String string, List<Item> items) {
-        return new NestedObject(string, items);
-    }
-
-    @Node
-    public Item list(@Node int id, @Node String name) {
-        return new Item(id, name);
-    }
-
 }

@@ -14,26 +14,29 @@
  * limitations under the License
  */
 
-package nl.ulso.sprox.json;
+package nl.ulso.sprox.json.complex;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
  */
-public class RootObject {
+public class NestedObject {
 
-    private final long id;
-    private final NestedObject nestedObject;
+    private final String string;
+    private final List<Item> items;
 
-    public RootObject(long id, NestedObject nestedObject) {
-        this.id = id;
-        this.nestedObject = nestedObject;
+    public NestedObject(String string, List<Item> items) {
+        this.string = string;
+        this.items = Collections.unmodifiableList(items);
     }
 
-    public long getId() {
-        return id;
+    public String getString() {
+        return string;
     }
 
-    public NestedObject getNestedObject() {
-        return nestedObject;
+    public List<Item> getItems() {
+        return items;
     }
 }

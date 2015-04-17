@@ -14,27 +14,26 @@
  * limitations under the License
  */
 
-package nl.ulso.sprox.json;
+package nl.ulso.sprox.json.complex;
 
 /**
  *
  */
-public class Item {
+public class RootObject {
 
     private final long id;
-    private final String name;
+    private final NestedObject nestedObject;
 
-    public Item(long id, String name) {
+    public RootObject(long id, NestedObject nestedObject) {
         this.id = id;
-        this.name = name;
+        this.nestedObject = nestedObject;
     }
 
     public long getId() {
-
         return id;
     }
 
-    public String getName() {
-        return name;
+    public NestedObject getNestedObject() {
+        return nestedObject;
     }
 }
