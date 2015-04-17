@@ -40,7 +40,8 @@ public class SpotifyAlbumTest {
                 .addControllerClass(AlbumFactory.class)
                 .buildXmlProcessor();
 
-        final Album album = processor.execute(SpotifyAlbumTest.class.getResourceAsStream("/0Y3eZqsEK2g4T6ecqw8ucR.json"));
+        final Album album = processor.execute(
+                SpotifyAlbumTest.class.getResourceAsStream("/spotify/0Y3eZqsEK2g4T6ecqw8ucR.json"));
 
         assertThat(album, notNullValue());
         assertThat(album.getTitle(), is("Insurgentes"));
