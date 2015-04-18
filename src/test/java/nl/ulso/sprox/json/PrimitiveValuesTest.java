@@ -23,7 +23,7 @@ import static nl.ulso.sprox.json.SproxJsonTests.processJsonString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class PrimitiveValueTest {
+public class PrimitiveValuesTest {
 
     @Test
     public void testObjectWithSingleIntegerValueAsString() throws Exception {

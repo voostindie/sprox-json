@@ -16,24 +16,21 @@
 
 package nl.ulso.sprox.json.complex;
 
-/**
- *
- */
-public class RootObject {
+public class ComplexObject {
 
     private final long id;
-    private final NestedObject nestedObject;
+    private final Container container;
 
-    public RootObject(long id, NestedObject nestedObject) {
+    public ComplexObject(long id, Container container) {
         this.id = id;
-        this.nestedObject = nestedObject;
+        this.container = container;
     }
 
     public long getId() {
         return id;
     }
 
-    public NestedObject getNestedObject() {
-        return nestedObject;
+    public Container getContainer() {
+        return container;
     }
 }

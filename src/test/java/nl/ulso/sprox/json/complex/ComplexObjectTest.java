@@ -31,7 +31,7 @@ public class ComplexObjectTest {
     public void testComplexObject() throws Exception {
         final String json = "{\n" +
                 "  \"id\": 42,\n" +
-                "  \"object\": {\n" +
+                "  \"container\": {\n" +
                 "    \"string\": \"Value\",\n" +
                 "    \"list\": [\n" +
                 "      {\n" +
@@ -50,27 +50,30 @@ public class ComplexObjectTest {
                 "  }\n" +
                 "}";
 
-        final RootObject object = processJsonString(json, RootObject.class, RootObjectController.class);
+        final ComplexObject object = processJsonString(json, ComplexObject.class, ComplexObjectController.class);
 
         assertThat(object, notNullValue());
-        assertThat(object.getNestedObject(), notNullValue());
-        final List<Item> items = object.getNestedObject().getItems();
+        assertThat(object.getId(), is(42L));
+        final Container container = object.getContainer();
+        assertThat(container, notNullValue());
+        assertThat(container.getString(), is("Value"));
+        final List<Item> items = container.getItems();
         assertThat(items.size(), is(3));
         final Item secondItem = items.get(1);
         assertThat(secondItem.getId(), is(2));
         assertThat(secondItem.getName(), is("Item 2"));
     }
 
-    public static final class RootObjectController {
+    public static final class ComplexObjectController {
 
         @Node
-        public RootObject root(@Node long id, NestedObject object) {
-            return new RootObject(id, object);
+        public ComplexObject root(@Node long id, Container object) {
+            return new ComplexObject(id, object);
         }
 
         @Node
-        public NestedObject object(@Node String string, List<Item> items) {
-            return new NestedObject(string, items);
+        public Container container(@Node String string, List<Item> items) {
+            return new Container(string, items);
         }
 
         @Node

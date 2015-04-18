@@ -14,19 +14,26 @@
  * limitations under the License
  */
 
-package nl.ulso.sprox.json;
+package nl.ulso.sprox.json.complex;
 
-import nl.ulso.sprox.XmlProcessorException;
-import org.junit.Test;
+import java.util.Collections;
+import java.util.List;
 
-public class MaximumDepthTest {
+public class Container {
 
-    @Test(expected = XmlProcessorException.class)
-    public void testCustomMaximumDepth() throws Exception {
-        SproxJsonTests.processString(
-                "{ \"o1\" : { \"int\": 1 }, \"o2\" : { \"string\": \"2\" } }",
-                String.class,
-                NestedObjectTest.NestedObjectController.class,
-                new JsonXmlInputFactory(1));
+    private final String string;
+    private final List<Item> items;
+
+    public Container(String string, List<Item> items) {
+        this.string = string;
+        this.items = Collections.unmodifiableList(items);
+    }
+
+    public String getString() {
+        return string;
+    }
+
+    public List<Item> getItems() {
+        return items;
     }
 }

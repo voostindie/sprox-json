@@ -17,6 +17,7 @@
 package nl.ulso.sprox.json;
 
 import nl.ulso.sprox.Node;
+import nl.ulso.sprox.XmlProcessorException;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -34,6 +35,15 @@ public class CustomizationTest {
                 ObjectWithIntegerAndCustomRootNodeNameController.class,
                 new JsonXmlInputFactory("custom"));
         assertThat(value, is(42));
+    }
+
+    @Test(expected = XmlProcessorException.class)
+    public void testCustomMaximumDepth() throws Exception {
+        SproxJsonTests.processString(
+                "{ \"o1\" : { \"int\": 1 }, \"o2\" : { \"string\": \"2\" } }",
+                String.class,
+                ContainerTest.NestedObjectController.class,
+                new JsonXmlInputFactory(1));
     }
 
     @Test

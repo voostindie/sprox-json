@@ -26,7 +26,7 @@ import static nl.ulso.sprox.json.SproxJsonTests.processXmlString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class NestedObjectTest {
+public class ContainerTest {
     @Test
     public void testNestedObjects() throws Exception {
         final String value = processJsonString(

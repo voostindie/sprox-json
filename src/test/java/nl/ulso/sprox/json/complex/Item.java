@@ -16,9 +16,6 @@
 
 package nl.ulso.sprox.json.complex;
 
-/**
- *
- */
 public class Item {
 
     private final int id;

@@ -28,7 +28,7 @@ import static nl.ulso.sprox.json.JsonValueParserWrapper.addDefaultJsonParsers;
 /**
  * Convenience methods for tests.
  */
-public class SproxJsonTests {
+public final class SproxJsonTests {
 
     private SproxJsonTests() {
     }
