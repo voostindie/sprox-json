@@ -127,6 +127,11 @@ class JsonXmlEventReader implements XMLEventReader {
 
     @Override
     public void close() throws XMLStreamException {
+        try {
+            parser.close();
+        } catch (JsonException e) {
+            throw new XMLStreamException(e);
+        }
     }
 
     @Override
