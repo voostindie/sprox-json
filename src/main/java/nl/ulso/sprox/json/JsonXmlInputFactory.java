@@ -154,12 +154,12 @@ public class JsonXmlInputFactory extends XMLInputFactory {
     }
 
     @Override
-    public void setProperty(String name, Object value) throws IllegalArgumentException {
+    public void setProperty(String name, Object value) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Object getProperty(String name) throws IllegalArgumentException {
+    public Object getProperty(String name) {
         throw new UnsupportedOperationException();
     }
 

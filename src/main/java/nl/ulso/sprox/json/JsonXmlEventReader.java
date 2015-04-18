@@ -138,7 +138,7 @@ class JsonXmlEventReader implements XMLEventReader {
     }
 
     @Override
-    public Object getProperty(String name) throws IllegalArgumentException {
+    public Object getProperty(String name) {
         throw new UnsupportedOperationException();
     }
 }

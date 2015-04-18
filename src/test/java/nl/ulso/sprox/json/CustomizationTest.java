@@ -46,6 +46,11 @@ public class CustomizationTest {
                 new JsonXmlInputFactory(1));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidCustomMaximumDepth() throws Exception {
+        new JsonXmlInputFactory(0);
+    }
+
     @Test
     public void testCustomRootNodeNameAndCustomMaximumDepth() throws Exception {
         final int value = SproxJsonTests.processString(

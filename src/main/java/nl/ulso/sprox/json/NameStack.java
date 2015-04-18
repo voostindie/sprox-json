@@ -17,7 +17,8 @@
 package nl.ulso.sprox.json;
 
 import javax.xml.stream.XMLStreamException;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * Keeps a stack of names in the JSON structure. Every nested object increases the depth of the stack by one.
@@ -25,10 +26,10 @@ import java.util.Stack;
 final class NameStack {
 
     private final int maxDepth;
-    private final Stack<Name> stack;
+    private final Deque<Name> stack;
 
     public NameStack(String rootNodeName, int maximumStackDepth) {
-        stack = new Stack<>();
+        stack = new ArrayDeque<>();
         maxDepth = maximumStackDepth;
         stack.push(new Name(rootNodeName));
     }
