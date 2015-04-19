@@ -41,14 +41,18 @@ public class JsonValueParserWrapper<T> implements Parser<T> {
     }
 
     public static <T> void addDefaultJsonParsers(XmlProcessorBuilder<T> builder) {
-        builder.addParser(new JsonValueParserWrapper<>(new BooleanParser()), Boolean.TYPE);
-        builder.addParser(new JsonValueParserWrapper<>(new ByteParser()), Byte.TYPE);
-        builder.addParser(new JsonValueParserWrapper<>(new CharacterParser()), Character.TYPE);
-        builder.addParser(new JsonValueParserWrapper<>(new DoubleParser()), Double.TYPE);
-        builder.addParser(new JsonValueParserWrapper<>(new FloatParser()), Float.TYPE);
-        builder.addParser(new JsonValueParserWrapper<>(new IntegerParser()), Integer.TYPE);
-        builder.addParser(new JsonValueParserWrapper<>(new LongParser()), Long.TYPE);
-        builder.addParser(new JsonValueParserWrapper<>(new StringParser()), String.class);
-        builder.addParser(new JsonValueParserWrapper<>(new ShortParser()), Short.TYPE);
+        builder.addParser(withJsonNull(new BooleanParser()), Boolean.TYPE);
+        builder.addParser(withJsonNull(new ByteParser()), Byte.TYPE);
+        builder.addParser(withJsonNull(new CharacterParser()), Character.TYPE);
+        builder.addParser(withJsonNull(new DoubleParser()), Double.TYPE);
+        builder.addParser(withJsonNull(new FloatParser()), Float.TYPE);
+        builder.addParser(withJsonNull(new IntegerParser()), Integer.TYPE);
+        builder.addParser(withJsonNull(new LongParser()), Long.TYPE);
+        builder.addParser(withJsonNull(new StringParser()), String.class);
+        builder.addParser(withJsonNull(new ShortParser()), Short.TYPE);
+    }
+
+    public static <T> Parser<T> withJsonNull(Parser<T> parser) {
+        return new JsonValueParserWrapper<>(parser);
     }
 }
