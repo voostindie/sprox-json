@@ -6,6 +6,8 @@
 
 This is **not** a general purpose JSON to XML adapter! This implementation provides the smallest implementation possible to make Sprox process JSON objects. Many methods throw an `UnsupportedOperationException`. Only what Sprox uses is implemented.
 
+Like Sprox this library can be used in an OSGi environment. The library is actually a proper bundle.
+
 ## Alternatives
 
 If you're looking for a (more) powerful JSON to XML adapter, have a look at:
@@ -27,7 +29,7 @@ To use `sprox-json`, add the following dependency to your Maven POM:
 </dependency>
 ```
 
-Note that you also need to include Sprox, at least version 3.1.1. That also means you need at least Java 8.
+Note that you also need to include Sprox, at least version 3.1.3. That also means you need at least Java 8.
 
 Once your project is set up correctly, you can declare and use a Sprox processor like so (for example):
 
