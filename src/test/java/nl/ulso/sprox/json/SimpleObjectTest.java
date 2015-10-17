@@ -19,8 +19,6 @@ package nl.ulso.sprox.json;
 import nl.ulso.sprox.Node;
 import org.junit.Test;
 
-import java.util.StringJoiner;
-
 import static nl.ulso.sprox.json.SproxJsonTests.processJsonString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
