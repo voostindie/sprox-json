@@ -9,9 +9,6 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-import static java.lang.Class.forName;
-import static java.lang.Integer.parseInt;
-import static nl.ulso.sprox.json.JsonValueParserWrapper.withJsonNull;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
 @RunWith(PaxExam.class)
@@ -30,17 +27,17 @@ public class OsgiBundleTest {
 
     @Test
     public void testCreateJsonXmlInputFactory() throws Exception {
-        forName("nl.ulso.sprox.json.JsonXmlInputFactory");
+        Class.forName("nl.ulso.sprox.json.JsonXmlInputFactory");
     }
 
     @Test
     public void testJsonXmlConstants() throws Exception {
-        forName("nl.ulso.sprox.json.JsonXmlConstants");
+        Class.forName("nl.ulso.sprox.json.JsonXmlConstants");
     }
 
     @Test
     public void testJsonValueParserWrapper() throws Exception {
-        forName("nl.ulso.sprox.json.JsonValueParserWrapper");
-        withJsonNull(::parseInt);
+        Class.forName("nl.ulso.sprox.json.JsonValueParserWrapper");
+        JsonValueParserWrapper.withJsonNull(Integer::parseInt);
     }
 }
