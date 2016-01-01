@@ -1,19 +1,3 @@
-/*
- * Copyright 2015 Vincent Oostindië
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License
- */
-
 package nl.ulso.sprox.json.osgi;
 
 import nl.ulso.sprox.json.JsonValueParserWrapper;
@@ -25,6 +9,9 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
+import static java.lang.Class.forName;
+import static java.lang.Integer.parseInt;
+import static nl.ulso.sprox.json.JsonValueParserWrapper.withJsonNull;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
 @RunWith(PaxExam.class)
@@ -43,17 +30,17 @@ public class OsgiBundleTest {
 
     @Test
     public void testCreateJsonXmlInputFactory() throws Exception {
-        Class.forName("nl.ulso.sprox.json.JsonXmlInputFactory");
+        forName("nl.ulso.sprox.json.JsonXmlInputFactory");
     }
 
     @Test
     public void testJsonXmlConstants() throws Exception {
-        Class.forName("nl.ulso.sprox.json.JsonXmlConstants");
+        forName("nl.ulso.sprox.json.JsonXmlConstants");
     }
 
     @Test
     public void testJsonValueParserWrapper() throws Exception {
-        Class.forName("nl.ulso.sprox.json.JsonValueParserWrapper");
-        JsonValueParserWrapper.withJsonNull(Integer::parseInt);
+        forName("nl.ulso.sprox.json.JsonValueParserWrapper");
+        withJsonNull(::parseInt);
     }
 }
