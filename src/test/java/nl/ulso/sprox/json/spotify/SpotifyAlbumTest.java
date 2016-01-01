@@ -6,7 +6,6 @@ import nl.ulso.sprox.json.JsonXmlInputFactory;
 import org.junit.Test;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 import static java.time.LocalDate.parse;
 import static java.time.format.DateTimeFormatter.ISO_DATE;

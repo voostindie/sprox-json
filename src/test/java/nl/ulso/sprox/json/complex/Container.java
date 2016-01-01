@@ -1,6 +1,5 @@
 package nl.ulso.sprox.json.complex;
 
-import java.util.Collections;
 import java.util.List;
 
 import static java.util.Collections.unmodifiableList;
