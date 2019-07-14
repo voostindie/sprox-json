@@ -1,8 +1,7 @@
 # Sprox - JSON support
 
 [![Build Status](https://travis-ci.org/voostindie/sprox-json.svg?branch=master)](https://travis-ci.org/voostindie/sprox-json)
-[![Code Quality](https://api.codacy.com/project/badge/97d48fcf4c324522ae7eaad3c2563632)](https://www.codacy.com/app/voostindie/sprox-json)
-[![Code Coverage](https://api.codacy.com/project/badge/coverage/97d48fcf4c324522ae7eaad3c2563632)](https://www.codacy.com/app/voostindie/sprox-json)
+[![Code Coverage](https://codecov.io/gh/voostindie/sprox-json/branch/master/graph/badge.svg)](https://codecov.io/gh/voostindie/sprox-json)
 
 `sprox-json` provides a limited implementation of the Java `XMLEventReader` interface specifically to allow [Sprox](https://github.com/voostindie/sprox) to process JSON documents.
 
