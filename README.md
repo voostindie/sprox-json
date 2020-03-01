@@ -30,7 +30,7 @@ To use `sprox-json`, add the following dependency to your Maven POM:
 </dependency>
 ```
 
-Note that you also need to include Sprox, at least version 3.1.3. That also means you need at least Java 8.
+Note that you also need to include Sprox, at least version 4.0.0. That also means you need at least Java 8.
 
 Once your project is set up correctly, you can declare and use a Sprox processor like so (for example):
 
@@ -128,7 +128,7 @@ And of course, it's up to you to handle this value.
 
 The easiest way to do this is to use the `JsonValueParserWrapper`. This parser implements the Sprox `Parser` interface and wraps another parser. It converts the ugly constant value back into an actual `null` value that it then returns. It passes any other String values to the parser it wraps. If you do this then in your controller classes all you need to do is define the parameter as an `Optional<String>`, which is exactly what you would want to do anyway.
 
-In case your processor needs to be able to map to all Java primitives and all values might be `null` in the JSON input, call the convience method `JsonValueParserWrapper.addDefaultJsonParsers(XmlProcessorBuilder<T> builder)` to replace all Sprox built-in parsers with parsers that support JSON null values.
+In case your processor needs to be able to map to all Java primitives and all values might be `null` in the JSON input, call the convenience method `JsonValueParserWrapper.addDefaultJsonParsers(XmlProcessorBuilder<T> builder)` to replace all Sprox built-in parsers with parsers that support JSON null values.
 
 ## Custom root node name
 
