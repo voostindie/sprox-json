@@ -8,29 +8,28 @@ import java.util.Optional;
 import java.util.StringJoiner;
 
 import static nl.ulso.sprox.json.SproxJsonTests.processJsonString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class ArrayTest {
     @Test
     public void testEmptyArray() throws Exception {
         final String json = "{ \"list\" : [] }";
         final String value = processJsonString(json, String.class, ArrayOfStringsController.class);
-        assertThat(value, is("[]"));
+        assertEquals("[]", value);
     }
 
     @Test
     public void testArrayWithOneElement() throws Exception {
         final String json = "{ \"list\" : [ \"one\" ] }";
         final String value = processJsonString(json, String.class, ArrayOfStringsController.class);
-        assertThat(value, is("[one]"));
+        assertEquals("[one]", value);
     }
 
     @Test
     public void testArrayWithMultipleElements() throws Exception {
         final String json = "{ \"list\" : [ \"one\", \"two\", \"three\" ] }";
         final String value = processJsonString(json, String.class, ArrayOfStringsController.class);
-        assertThat(value, is("[one,two,three]"));
+        assertEquals("[one,two,three]", value);
     }
 
     public static final class ArrayOfStringsController {

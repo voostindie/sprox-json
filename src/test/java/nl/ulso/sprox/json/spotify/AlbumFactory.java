@@ -15,18 +15,18 @@ import java.util.List;
 public class AlbumFactory {
 
     @Node("album")
-    public Album createAlbum(@Node String name, @Node("release_date") LocalDate releaseDate, Artist artist,
+    public Album createAlbum(@Node("name") String name, @Node("release_date") LocalDate releaseDate, Artist artist,
                              List<Track> tracks) {
         return new Album(name, releaseDate, artist, tracks);
     }
 
     @Node("artists")
-    public Artist createArtist(@Node String name) {
+    public Artist createArtist(@Node("name") String name) {
         return new Artist(name);
     }
 
     @Node("items")
-    public Track createTrack(@Node("track_number") Integer trackNumber, @Node String name) {
+    public Track createTrack(@Node("track_number") Integer trackNumber, @Node("name") String name) {
         return new Track(trackNumber, name);
     }
 }

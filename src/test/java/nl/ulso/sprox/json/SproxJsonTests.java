@@ -18,7 +18,7 @@ public final class SproxJsonTests {
     private SproxJsonTests() {
     }
 
-    public static <T> T processString(String string, Class<T> resultClass, Class controllerClass, XMLInputFactory factory)
+    public static <T> T processString(String string, Class<T> resultClass, Class<?> controllerClass, XMLInputFactory factory)
             throws XmlProcessorException {
         final XmlProcessorBuilder<T> builder = new StaxBasedXmlProcessorBuilderFactory()
                 .createXmlProcessorBuilder(resultClass)
@@ -28,12 +28,12 @@ public final class SproxJsonTests {
         return builder.buildXmlProcessor().execute(new StringReader(string));
     }
 
-    public static <T> T processJsonString(String json, Class<T> resultClass, Class controllerClass)
+    public static <T> T processJsonString(String json, Class<T> resultClass, Class<?> controllerClass)
             throws XmlProcessorException {
         return processString(json, resultClass, controllerClass, new JsonXmlInputFactory());
     }
 
-    public static <T> T processXmlString(String xml, Class<T> resultClass, Class controllerClass)
+    public static <T> T processXmlString(String xml, Class<T> resultClass, Class<?> controllerClass)
             throws XmlProcessorException {
         return processString(xml, resultClass, controllerClass, newFactory());
     }

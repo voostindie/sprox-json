@@ -4,8 +4,7 @@ import nl.ulso.sprox.Node;
 import org.junit.Test;
 
 import static nl.ulso.sprox.json.SproxJsonTests.processJsonString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class PrimitiveValuesTest {
 
@@ -17,7 +16,7 @@ public class PrimitiveValuesTest {
                         "}",
                 Integer.class,
                 IntegerValueController.class);
-        assertThat(value, is(42));
+        assertEquals(42, value);
     }
 
     @Test
@@ -26,7 +25,7 @@ public class PrimitiveValuesTest {
                 "{\n  \"value\": 42\n}\n",
                 Integer.class,
                 IntegerValueController.class);
-        assertThat(value, is(42));
+        assertEquals(42, value);
     }
 
     @Test
@@ -37,12 +36,12 @@ public class PrimitiveValuesTest {
                         "}",
                 Double.class,
                 DoubleValueController.class);
-        assertThat(value, is(-0.123456789));
+        assertEquals(-0.123456789, value, 0);
     }
 
     public static final class IntegerValueController {
         @Node
-        public Integer root(@Node int value) {
+        public Integer root(@Node Integer value) {
             return value;
         }
     }

@@ -55,5 +55,4 @@ public class CustomizationTest {
             return value;
         }
     }
-
 }

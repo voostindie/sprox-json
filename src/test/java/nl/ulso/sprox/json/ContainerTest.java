@@ -7,8 +7,7 @@ import java.util.StringJoiner;
 
 import static nl.ulso.sprox.json.SproxJsonTests.processJsonString;
 import static nl.ulso.sprox.json.SproxJsonTests.processXmlString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class ContainerTest {
     @Test
@@ -17,14 +16,14 @@ public class ContainerTest {
                 "{ \"o1\" : { \"int\": 1 }, \"o2\" : { \"string\": \"2\" } }",
                 String.class,
                 NestedObjectController.class);
-        assertThat(value, is("1,2"));
+        assertEquals("1,2", value);
     }
 
     @Test
     public void testNestedObjectsXmlVersion() throws Exception {
         final String xml = "<root><o1><int>1</int></o1><o2><string>2</string></o2></root>";
         final String value = processXmlString(xml, String.class, NestedObjectController.class);
-        assertThat(value, is("1,2"));
+        assertEquals("1,2", value);
     }
 
     public static final class NestedObjectController {
